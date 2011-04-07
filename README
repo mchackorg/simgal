@@ -1,0 +1,61 @@
+-*- text -*-
+
+Time-stamp: <2011-04-07 06:42:41 MEST>
+
+simgal - a small foto album generator
+
+Copyright (c) 2011 Michael Cardell Widerkrantz, mc at the domain
+hack.org.
+
+See LICENSE.
+
+This is a small scripts to generate a static HTML(5!) photo album with
+thumbnails and previews given a directory of JPEG images.
+
+To use, just cd to your photo directory and run the script. Then go
+fetch some coffee. If you have a lot of images, it will take a long
+time to run the first time. If you add images later and rerun the
+program it should be *much* quicker.
+
+NOTE! The JPEG images will be rotated in place if there are EXIF
+headers saying that they should be. The rotation is lossless and
+modification time of the files will be preserved.
+
+Prerequisites:
+
+  - zsh. The script was born as a Bourne script, but got changed
+    to zsh when I needed arrays for the previous and next links.
+    Sorry.
+
+  - ls. Currently does the sorting. See below if you want to
+    change.
+
+  - FreeBSD's stat(1). There might be a stat(1) in your Unix, too,
+    but it might use some other options to get the same result.
+    Check the manual page!
+
+  - convert from ImageMagick:
+
+    http://www.imagemagick.org/
+
+  - jhead
+
+    http://www.sentex.net/~mwandel/jhead/
+
+    Used to get EXIF data and JPEG comments (COM blocks) from the
+    images. If you want to add comments to a picture, which will
+    be displayed in the HTML files, you can use jhead -ce or
+    wrjpgcom.
+
+  - jpegtran
+
+    Called from jhead to rotate images. Included with libjpeg in
+    most cases but can be found here:
+
+    http://jpegclub.org/
+
+    Yes I know about the -scale options but some viewers, for
+    instance my Firefox, wouldn't show a scaled JPEG file so I
+    stick with convert for now.
+
+
