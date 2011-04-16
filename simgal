@@ -1,0 +1,206 @@
+#! /bin/sh
+
+# Change to your title.
+mytitle="Photo Album"
+
+# Uncomment and set to an URL to your stylesheet.
+# stylesheet="http://hack.org/mc/gallery.css"
+
+# Set the width and height of the desired thumbnail images and the
+# scaled preview.
+thumbwidth="150"
+thumbheight="150"
+
+scaledwidth="640"
+scaledheight="400"
+
+# Get all image files in the order we want them. Change the options to
+# ls if you want them in some other order. Or create an $images some
+# other way. You might, for instance, want to walk through the images
+# and look for EXIF timestamps and sort after that instead.
+images=`ls -tr *.jpg`
+
+# You should probably not touch the variables below.
+thumbdir="thumbs"
+scaledir="scaled"
+indexfile="index.html"
+
+thumbsize="${thumbwidth}x${thumbheight}"
+scaledsize="${scaledwidth}x${scaledheight}"
+
+######################### Helper functions ###########################
+### See the end for main program.
+######################################################################
+
+### Create a preview image, possibly rotating the master image first.
+scale() 
+{
+    if ! [ -f $scaledir/$current ]
+    then
+        # Possibly rotate the image first.
+	
+        # Remember modified time
+ 	mtime=`stat -t "%Y%m%d%H%M.%S" -f %Sm $f`
+	
+        # Possibly rotate the image.
+ 	jhead -autorot $current
+
+        # Set mtime again
+ 	touch -m -t $mtime $current
+
+        # Now create scaled preview.
+ 	convert $current -thumbnail $scaledsize $scaledir/$current
+    fi
+}
+
+### Create a thumbnail image.
+thumb()
+{
+    # Only create thumbnail if it isn't already there.
+    if ! [ -f $thumbdir/$current ]
+    then
+   	# Create thumbnail from scaled preview.
+ 	convert $scaledir/$current -thumbnail ${thumbsize}^ \
+	    -gravity center -extent ${thumbsize} $thumbdir/$current
+    fi
+}
+
+### Create the HTML file per image
+htmlfile()
+{
+    # Create HTML file if it isn't there already.
+    imagefile="$current.html"
+    if ! [ -f $imagefile ]
+    then
+	{
+	    echo "<!DOCTYPE html>"
+	    echo "<html>"
+	    echo "<head>"
+	    echo "<meta charset='UTF-8'>"
+ 	    echo "<meta http-equiv='content-type' content='text/html; charset=UTF-8'>"
+    
+	    if [ x${stylesheet} != "x" ]
+ 	    then
+ 		echo "<link rel='stylesheet' type='text/css' href='$stylesheet'>"
+ 	    fi
+
+ 	    echo "<title>$current</title>"
+ 	    echo "</head>" 
+ 	    echo "<body>"
+
+            # Show a scaled preview of the image.
+	    #
+	    # Let's not use width and height here, because we don't
+	    # know if the convert operation changed it. The image
+	    # might be rotated and has a different width now, for
+	    # instance.
+	    echo "<p> <a href='$current' accesskey='z'><img src='$scaledir/$current' alt='Preview of $current'></a> </p>"
+
+	    exifdata=`jhead $current |awk '/^Date.*/ { print $3,$4 } ; /^Comment/ { print $3 }'`
+	    echo "<pre>$exifdata</pre>"
+
+	    echo "<p>"
+
+   	    # If this isn't the first image, link to the previous
+	    # image with a thumbnail.
+	    if [ x${prev} != "x" ]
+	    then
+ 		echo "<a href='${prev}.html' accesskey='p'><img src='thumbs/${prev}' width='$thumbwidth' height='$thumbheight' alt='Previous'></a>"
+ 	    else
+ 		echo "No previous."
+ 	    fi
+
+            # If this isn't the last image, link to the next image
+            # with a thumbnail.
+ 	    if [ x${next} != "x" ]
+ 	    then
+ 		echo "<a href='${next}.html' accesskey='n'><img src='thumbs/$next' width='$thumbwidth' height='$thumbheight' alt='Next'></a>"
+ 	    else
+ 		echo "No next."
+ 	    fi
+
+ 	    echo "</p>"
+
+ 	    echo "<p> <a href='index.html' accesskey='u'>Up to Album Index</a> </p>"  
+ 	    echo "<p> <strong>U</strong>: Up <strong>N</strong>: Next <strong>P</strong>: Previous <strong>Z</strong>: Zoom </p>"
+ 	    echo "</body>"
+ 	    echo "</html>"
+	} > $imagefile
+    fi
+}
+
+### Add a thumbnail image to the index.
+addtoindex()
+{
+    # Better use width and height here. If some images are smaller
+    # than $thumbsize they will stretch but the index will still load
+    # much faster.
+    
+    echo "<a href='$imagefile'><img src='$thumbdir/$current' width='$thumbwidth' height='$thumbheight'></a>" >>$indexfile
+}
+
+### Loop through all files.
+fileloop() 
+{
+    max=$#
+
+    echo "Processing $max images."
+
+    files=$@
+    prev=''
+    for current in $files
+    do
+	shift
+	next=$1
+
+	echo "Processing $current"
+
+	scale
+	thumb
+	htmlfile
+	addtoindex
+
+	prev=$current
+    done
+}
+
+# Index file HTML header.
+header()
+{
+    {
+	echo "<!DOCTYPE html>"
+	echo "<html>"
+	echo "<head>"
+	echo "<meta charset='UTF-8'>"
+	echo "<meta http-equiv='content-type' content='text/html; charset=UTF-8'>"
+    
+	if [ x${stylesheet} != "x" ]
+	then
+	    echo "<link rel='stylesheet' type='text/css' href='$stylesheet'>"
+	fi
+
+	echo "<title>$mytitle</title>"
+	echo "</head>"
+	echo "<body>"
+    } > $indexfile 
+}
+
+# Index file HTML footer.
+footer()
+{
+    {
+	echo "<p> <a href='../' accesskey='u'><strong>U</strong>p to Directory</a> </p>"
+	echo "<p> Generated by <a href="http://hack.org/mc/hacks/simgal/">simgal</a>. </p>"
+	echo "</body>"
+	echo "</html>"
+    } >>$indexfile 
+}
+
+################# Main Program #################
+
+[ -d $thumbdir ] || mkdir $thumbdir
+[ -d $scaledir ] || mkdir $scaledir
+
+header
+fileloop $images
+footer

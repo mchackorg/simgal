@@ -1,6 +1,6 @@
 -*- text -*-
 
-Time-stamp: <2011-04-07 06:42:41 MEST>
+Time-stamp: <2011-04-16 23:38:46 MEST>
 
 simgal - a small foto album generator
 
@@ -9,8 +9,8 @@ hack.org.
 
 See LICENSE.
 
-This is a small scripts to generate a static HTML(5!) photo album with
-thumbnails and previews given a directory of JPEG images.
+This is a small shell script to generate a static HTML(5!) photo album
+with thumbnails and preview images given a directory of JPEG images.
 
 To use, just cd to your photo directory and run the script. Then go
 fetch some coffee. If you have a lot of images, it will take a long
@@ -23,12 +23,13 @@ modification time of the files will be preserved.
 
 Prerequisites:
 
-  - zsh. The script was born as a Bourne script, but got changed
-    to zsh when I needed arrays for the previous and next links.
-    Sorry.
+  - sh. The script was born as a Bourne script, got changed to zsh
+    when I needed arrays for the previous and next links and was then
+    rewritten as a pure Bourne shell script again in an inspired
+    evening.
 
-  - ls. Currently does the sorting. See below if you want to
-    change.
+  - ls. Currently does the sorting of the files. See at the top of the
+    script simgal. Change it to what you want.
 
   - FreeBSD's stat(1). There might be a stat(1) in your Unix, too,
     but it might use some other options to get the same result.
@@ -57,5 +58,3 @@ Prerequisites:
     Yes I know about the -scale options but some viewers, for
     instance my Firefox, wouldn't show a scaled JPEG file so I
     stick with convert for now.
-
-
