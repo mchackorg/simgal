@@ -143,12 +143,10 @@ addtoindex()
 fileloop() 
 {
     max=$#
-
     echo "Processing $max images."
 
-    files=$@
     prev=''
-    for current in $files
+    for current
     do
 	shift
 	next=$1
