@@ -68,9 +68,13 @@ thumb()
 ### Create the HTML file per image
 htmlfile()
 {
-    # Create HTML file if it isn't there already.
+    # Create HTML file if it isn't there already. If this was the last
+    # image in the previous run, regenerate file anyway since we
+    # want to link to the new images.
+
     imagefile="$current.html"
-    if ! [ -f $imagefile ]
+
+    if ! [ -f $imagefile ] || [ x${imagefile} = x${lastimage} ]
     then
 	{
 	    echo "<!DOCTYPE html>"
@@ -117,6 +121,11 @@ htmlfile()
  		echo "<a href='${next}.html' accesskey='n'><img src='thumbs/$next' width='$thumbwidth' height='$thumbheight' alt='Next'></a>"
  	    else
  		echo "No next."
+                
+                # Remember this particular HTML file so we know what's
+                # the last image when we run the script again to add
+                # new images.
+                echo $imagefile > .last
  	    fi
 
  	    echo "</p>"
@@ -198,6 +207,11 @@ footer()
 
 [ -d $thumbdir ] || mkdir $thumbdir
 [ -d $scaledir ] || mkdir $scaledir
+
+if [ -f .last ]
+then
+    lastimage=`cat .last`
+fi
 
 header
 fileloop $images
