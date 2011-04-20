@@ -1,0 +1,7 @@
+-*- text -*-
+
+2011-04-20
+
+  * Now remembers last generated image preview file in .last so we can
+    regenerate that HTML file when adding new images and link them
+    with next link.
