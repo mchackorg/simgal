@@ -23,7 +23,10 @@ images=`ls -tr *.jpg`
 # You should probably not touch the variables below.
 thumbdir="thumbs"
 scaledir="scaled"
-indexfile="index.html"
+realindexfile="index.html"
+
+# Temporary index file while working.
+indexfile="tmpindex.html"
 
 thumbsize="${thumbwidth}x${thumbheight}"
 scaledsize="${scaledwidth}x${scaledheight}"
@@ -205,6 +208,17 @@ footer()
 
 ################# Main Program #################
 
+if [ -f $indexfile ] 
+then
+    echo "I found $indexfile!"
+    echo "Exiting..."
+    echo "Someone else might be regenerating this album right now."
+    echo "Or someone terminated the script before it was finished."
+    echo "If you're sure, you can remove $indexfile and try again."
+
+    exit
+fi
+
 [ -d $thumbdir ] || mkdir $thumbdir
 [ -d $scaledir ] || mkdir $scaledir
 
@@ -216,3 +230,6 @@ fi
 header
 fileloop $images
 footer
+
+# Create the real index file.
+mv $indexfile $realindexfile
