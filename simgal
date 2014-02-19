@@ -18,7 +18,7 @@ scaledheight="400"
 # ls if you want them in some other order. Or create an $images some
 # other way. You might, for instance, want to walk through the images
 # and look for EXIF timestamps and sort after that instead.
-images=`ls -tr *.jpg`
+images=`ls -tr *.[jJ][pP][gG]`
 
 # You should probably not touch the variables below.
 thumbdir="thumbs"
