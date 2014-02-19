@@ -103,7 +103,7 @@ htmlfile()
 	    # instance.
 	    echo "<p> <a href='$current' accesskey='z'><img src='$scaledir/$current' alt='Preview of $current'></a> </p>"
 
-	    exifdata=`jhead $current |awk '/^Date.*/ { print $3,$4 } ; /^Comment/ { print $3 }'`
+	    exifdata=`jhead $current |awk '/^Date.*/ { print $3,$4 } ; /^Comment/ { print substr($0, index($0,$3)) }'`
 	    echo "<pre>$exifdata</pre>"
 
 	    echo "<p>"
