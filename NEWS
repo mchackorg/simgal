@@ -1,5 +1,9 @@
 -*- text -*-
 
+2014-02-19
+
+  * Now prints the entire EXIF comment and not just the first word.
+
 2011-04-20
 
   * Now remembers last generated image preview file in .last so we can
