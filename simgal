@@ -134,7 +134,7 @@ htmlfile()
  	    echo "</p>"
 
  	    echo "<p> <a href='index.html' accesskey='u'>Up to Album Index</a> </p>"  
- 	    echo "<p> <strong>U</strong>: Up <strong>N</strong>: Next <strong>P</strong>: Previous <strong>Z</strong>: Zoom </p>"
+
  	    echo "</body>"
  	    echo "</html>"
 	} > $imagefile
